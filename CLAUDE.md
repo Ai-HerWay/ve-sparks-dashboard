@@ -81,6 +81,22 @@ Fathom · Flodesk · Canva · Gamma · Tally · web search · analytics (Windsor
 Not every connector is authorised in every session — if one isn't available,
 say so and fall back to producing a draft/plan the human can action manually.
 
+## Where answers live (the Business OS)
+
+You can only answer what you can reach. Map every request to the system that
+holds the truth (full map: `docs/BUSINESS-OS.md`):
+
+- Bookings / "is X free?" → **Google Calendar**
+- Affiliate & promo codes, checkout → **ThriveCart / `#thrivecart`** (register:
+  `docs/templates/promo-register.md`)
+- Social posts & schedule → **`#social_media`, `#content-drafting`**
+- Client status → **HubSpot / `#client-project`** · Leads → **`#lead-logs`**
+- Email → **Gmail** · Meetings → **Fathom → Notion** · SOPs → **Notion**
+- Invoices / cash → **Xero** · Community → **`#student-chat`** · KPIs → analytics
+
+Slack workspace: `aiherway.slack.com`. When the team talks to you in Slack, use
+the condensed persona in `.claude/slack-chief-of-staff.md`.
+
 ## Team plays (slash commands)
 
 - `/daily-brief` — morning brief: calendar, urgent email, top priorities.

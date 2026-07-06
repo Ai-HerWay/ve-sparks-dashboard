@@ -1,49 +1,68 @@
-# Slack: interacting with the Chief of Staff as a team
+# Slack: the whole team's front door to the Chief of Staff
 
-The whole team can work with the Chief of Staff through Slack, in two ways.
+Goal: anyone on the team can ask in Slack — "is Nici free Thursday?", "what's the
+affiliate code for the July promo?", "draft a reply to this client" — and get an
+answer or a ready-to-approve draft. This is the interface to the
+**business OS** (`docs/BUSINESS-OS.md`).
 
-## Way 1 — Briefs and updates get posted to Slack (available now)
+## Your workspace (detected)
 
-The Chief of Staff has a Slack connector. Any play can post its output to a
-channel. To turn this on:
+`aiherway.slack.com` — relevant channels the agent can already read:
 
-1. Create/choose a channel, e.g. `#chief-of-staff` or `#daily-brief`.
-2. Add the channel name (or ID) here so the agents know where to post:
+| Channel            | Used for                          |
+| ------------------ | --------------------------------- |
+| `#general`         | Team-wide; a good home for briefs |
+| `#thrivecart`      | Affiliate / promo codes, checkout |
+| `#social_media`    | Social posts & scheduling         |
+| `#content-drafting`| Content in progress               |
+| `#client-project`  | Client work                       |
+| `#lead-logs`       | Incoming leads                    |
+| `#student-chat`    | Course / community                |
 
-   > **Team channel:** `#___________`  ← fill this in
-   > **Who the brief is for:** Nici (and the wider team for weekly reviews)
+## Two capabilities, two setups
 
-3. Then, at the end of `/daily-brief`, `/weekly-review`, etc., say
-   "post it to `#chief-of-staff`" and it will. Once you've confirmed the format
-   is right, combine this with `docs/SCHEDULING.md` so it posts automatically.
+### A) It can already READ and POST (works now)
+The Slack connector is live — the Chief of Staff can search channels, read
+threads, and post messages. So today it can: post the daily brief to a channel,
+look up "what's in `#thrivecart`", summarise `#lead-logs`, etc. This is driven
+from Claude Code (chat or a scheduled task).
 
-The Chief of Staff will always **draft** the Slack message and confirm before the
-first post; once you're happy, you can let scheduled briefs post directly.
+### B) The team @mentions it and gets a reply (needs the Slack app)
+For teammates to talk to it *natively* in Slack — `@Claude` in a channel or a DM —
+a workspace admin adds **Anthropic's official Claude app for Slack** (included in
+your Claude Teams plan). Then:
 
-## Way 2 — The team messages the Chief of Staff from Slack (setup required)
+1. Admin installs Claude for Slack and authorises the connectors it should use
+   (Google Calendar, Gmail, HubSpot, Notion, etc.).
+2. Paste `.claude/slack-chief-of-staff.md` into the app's **custom instructions**
+   (or a Slack Project) so it behaves as *your* Chief of Staff, not a blank Claude.
+3. Invite it to the channels the team will use (start with `#general`).
+4. Test the two examples below.
 
-Two options, depending on how hands-on you want to be:
+> The install + connector authorisation is an admin action in Slack / claude.ai
+> settings — it can't be done from inside an agent session. Everything else (the
+> persona, the answer-source map, the registers) is built and waiting in this repo.
 
-- **Claude in Slack (Anthropic's official app).** With our Claude Teams plan, a
-  workspace admin can add the Claude app to Slack so anyone can `@Claude` in a
-  channel or DM. This gives a great conversational front door. Note: the Slack
-  app is a single assistant — to give it this exact chief-of-staff behaviour,
-  paste the routing/guardrail summary from `CLAUDE.md` into its custom
-  instructions, or point it at this repo. It won't have the full subagent
-  machinery that Claude Code has, but it's the fastest way to make the team
-  interaction live.
+## The two examples, wired end-to-end
 
-- **Claude Code on the web + Slack trigger (full power).** Keep the real
-  multi-agent system in Claude Code, and use Slack as the notification + trigger
-  surface: the team drops requests in a channel, and a scheduled Claude Code task
-  (see `SCHEDULING.md`) reads the channel, delegates, and posts results back.
-  This keeps all 10 specialists in play.
+**"Has Nici got something booked Thursday 2pm?"**
+`@Claude` → reads the shared Google Calendar → "She's in the Acme call 2–2:30pm,
+free after." *Prereq:* Nici shares her calendar (free/busy) with the team, or the
+app uses a shared Ai HerWay calendar. Decide this once — see Permissions in
+`docs/BUSINESS-OS.md`.
 
-### Recommended path
-Start with **Way 1** today (zero setup — just name a channel), add **Claude in
-Slack** for casual team questions, and graduate to the Claude Code + Slack
-trigger loop once the daily brief is proven.
+**"What's our affiliate promo code for the July social?"**
+`@Claude` → reads `#thrivecart` / the Promo & Campaign Register → "Code `HERWAY25`,
+link <…>, 25% off, runs 01–14/07." Works with what you have today; the register
+(`docs/templates/promo-register.md`) makes it exact.
 
-> Admin note: adding the Claude Slack app and authorising connectors is done by a
-> workspace admin in Slack / claude.ai settings. This can't be done from inside a
-> non-interactive agent session.
+## Rollout
+
+1. **Today:** post `/daily-brief` output to `#general` from Claude Code.
+2. **This week:** admin installs Claude for Slack + persona; test the two examples
+   in a private channel.
+3. **Next:** put the daily brief on a schedule (`docs/SCHEDULING.md`) so it posts
+   itself; widen access channel by channel.
+
+Guardrails from `CLAUDE.md` apply in Slack too: it answers and drafts, but never
+sends client messages, moves money, or posts publicly without approval.
