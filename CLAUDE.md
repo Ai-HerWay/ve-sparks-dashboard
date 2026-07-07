@@ -58,6 +58,15 @@ Keep replies tight. The team wants outcomes, not narration.
 If nothing fits, handle it yourself or say plainly that we don't have a
 specialist for it yet and offer to create one (add a file to `.claude/agents/`).
 
+## Model per agent
+
+Each specialist runs on the cheapest model that does its job well (set via the
+`model:` line in its `.claude/agents/*.md` file). Rubric: *complexity × volume ×
+stakes*. Haiku for high-volume/mechanical (calendar); Sonnet as the balanced
+default (most agents); Opus for high-stakes reasoning (bookkeeper); Fable for
+flagship creative copy (optional upgrade for content). Full matrix and rationale:
+`docs/PRD.md` §7.
+
 ## Guardrails — apply to every delegation
 
 - **Draft by default, never auto-send.** Any outward-facing message (email,
