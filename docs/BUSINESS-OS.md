@@ -62,6 +62,26 @@ A template for the Promo & Campaign Register is in
 - **Confidential data stays put.** Financials and client PII are surfaced to the
   people who should see them, in the channels where they belong.
 
+## The Notion control plane (live — created 07/07/2026)
+
+Home page: **🤖 Digital Team HQ — AI Her Way** —
+https://app.notion.com/p/39636d60c9a7810dbfe6d7c6f9479528
+(page ID `39636d60-c9a7-810d-bfe6-d7c6f9479528`). Drag it into the
+**🎉 Ai Her Way HQ** teamspace so the whole team can see it.
+
+| Database | Database page | Data source ID (for queries/writes) |
+| --- | --- | --- |
+| Requests | `259d2bd7-b146-4827-9d2a-8e79e719d4ad` | `f7dde64d-39cb-4fb0-bbde-41e33d49501d` |
+| Agent Registry | `db4589f9-5d47-402b-b995-06367b2b63d5` | `f70e5e93-eedc-4585-8b56-118523f05a0e` |
+| Knowledge Base / SOPs | `61abe9e8-bcd3-4cb0-8e60-8d34f3cb2c64` | `adffefe6-2c3f-42e9-ad8a-bd7142dd992c` |
+| Promo & Campaign Register | `88ba313e-d6b1-4ede-a356-195729d53283` | `bc74bf19-a3ee-4f37-8831-db5d49df2af1` |
+| Client Directory | `000a7cbc-19d5-4c87-9db5-1359fe6f9d43` | `6db0a500-b1e0-448d-9960-b074184a87c2` |
+| Activity Log | `70672c3b-6964-46b1-8b2a-c70557642f1f` | `ed9df664-f5be-4b6f-9a64-f44e3ad9d803` |
+
+Child pages of the HQ page: 📖 Manual (`39636d60-c9a7-8146-b465-e0b8936788dc`)
+and 📋 PRD v2 summary (`39636d60-c9a7-813d-baa1-f4b287714b84`) — mirrors of
+`docs/MANUAL.md` and `docs/PRD.md`; change one, update the other.
+
 ## How the pieces connect
 
 ```

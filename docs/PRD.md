@@ -1,81 +1,124 @@
-# PRD — Ai HerWay Multi-Agent Chief-of-Staff System
+# PRD — AI Her Way Digital Team (Chief of Staff + Departments)
 
-**Owner:** Nici (nici@aiherway.com.au) · **Status:** Draft v1 for build ·
+**Owner:** Nici (nici@aiherway.com.au) · **Status:** v2 — built, in team testing ·
 **Author:** Chief of Staff (Claude) · **Last updated:** 07/07/2026
 
-> Purpose of this document: a single, buildable spec a delivery agent (or a human
-> dev) can pick up and execute. It explains the pattern, the requirements, the
-> architecture, the data model, the exact build steps, and the acceptance
-> criteria. It is written to be **gold standard and easy for others to fork.**
+> v2 supersedes the v1 draft. What changed: the flat 10-specialist roster is now
+> organised into **departments matching the AI OS we teach in the Hub**
+> (Foundation + department heads + specialists), the Notion strategy is pinned
+> down as **board-not-brain** with real cost numbers, and the replication kit is
+> reframed as a **Hub product** (the missing CEO OS department). The v1
+> functional requirements, data model, and guardrails carry over.
 
 ---
 
 ## 1. Summary
 
-We are building an **AI "digital team"** for Ai HerWay: one **Chief of Staff**
-orchestrator that receives every request, routes it to the right **specialist
-agent**, and reports back — with guardrails so nothing risky happens without a
-human. Each specialist can run on a **different AI model** chosen for its job.
-The team is reachable two ways:
+An **AI digital team** for AI Her Way: one **Chief of Staff** that receives
+every request, routes it to the right **department** and specialist, and
+reports back — with guardrails so nothing risky happens without a human.
 
-- **Notion** — the day-to-day **control plane**: a task board where work is
-  requested, routed, worked, and approved, plus the knowledge the agents rely on.
-- **Slack** — the **quick-chat front door**: ask a question, get an answer or a
-  ready-to-approve draft in the thread.
+- **Nici stays the CEO.** The orchestrator is a chief of *staff*, not a chief
+  executive: it routes, drafts, and surfaces. Humans decide. This keeps the
+  system consistent with the AI OS philosophy we teach ("You: the CEO. The AI
+  works for you.") — the CoS layer is the **CEO OS** department the student
+  library has reserved but never shipped.
+- **Notion is the board, Claude is the brain.** The team requests, watches,
+  and approves in Notion (six databases). All reasoning runs in Claude Code
+  under the existing Claude plan — marginal cost ≈ $0. Notion AI credits are
+  never spent on work Claude already does.
+- **Slack is the front door** for quick questions, via the official Claude for
+  Slack app.
+- **Each specialist declares its own model** — the cheapest that does the job
+  well.
 
-Under the hood the work runs in **Claude Code** (this repo): the Chief of Staff
-and specialists are defined as files, run on demand or on a schedule.
+### Status at v2
 
-Phase 0 (the file-based Chief of Staff + 10 specialists + commands) is **already
-built in this repo**. This PRD specs the rest: per-agent models, the Notion
-control plane, the Slack front door, proactivity, and the replication kit.
+| Piece | Status |
+| --- | --- |
+| Chief of Staff brain (`CLAUDE.md`) + routing | ✅ Built |
+| 10 specialists with per-agent models | ✅ Built |
+| Foundation (shared memory, voice, governance) | ✅ Built (v2) |
+| 5 department head cards (`departments/*/AGENT.md`) | ✅ Built (v2) |
+| Plays incl. `/process-queue` | ✅ Built (v2) |
+| Notion control plane (6 databases) | ✅ Created — IDs in `docs/BUSINESS-OS.md` |
+| Team manual (use + test) | ✅ `docs/MANUAL.md` |
+| Slack front door | ⬜ Admin install pending (§10.1 A1) |
+| Schedules (daily brief, queue sweep) | ⬜ Turn on after first manual test week |
+| Fork kit → Hub CEO OS product | ⬜ After a month of internal dogfooding |
 
 ---
 
-## 2. How Allie K. Miller does this (the pattern we're standardising)
+## 2. Architecture — how it matches the AI OS we teach
 
-Allie K. Miller (ex-Amazon/IBM, "#1 most-followed voice in AI business") built a
-**digital workforce of ~34 agents** and popularised the model we're following:
+The Hub's AI OS structure is: **Foundation** (shared memory, voice,
+governance) with self-contained **departments** on top, each run by a manager
+brain that routes to skills. This repo is that exact structure, plus two
+things a *team* (rather than a solo founder) needs:
 
-- **One orchestrator that does no work itself.** A "chief of staff" agent reads
-  the request, decides the owner, delegates, and reports back. The other ~33 are
-  specialists (e.g. `email-drafting`, `client-notes`, `meeting-scheduling`).
-- **Built in natural language inside Claude Code.** No traditional coding — the
-  agents, the repeatable "plays", and the schedules are markdown + config.
-- **Proactive, not just reactive.** Scheduled tasks make agents act *before*
-  you ask (a morning brief lands on its own).
-- **Grow into it.** She didn't build 33 on day one; she added specialists as real
-  needs appeared. Non-engineers replicate it within ~48 hours once they see it.
-- **The four modes of AI** (her framing): microtasker → companion → delegate →
-  **teammate**. The chief-of-staff layer is what gets you to "teammate" — many
-  agents running in parallel without you micromanaging each one.
+1. **A Chief of Staff layer** — because three humans share one digital team,
+   requests need one router and one audit trail.
+2. **Team surfaces** — Notion (persistent, visible workflow) and Slack
+   (quick chat), so nobody needs a terminal to use or supervise the system.
 
-Full research + sources: `docs/RESEARCH.md`. Our contribution on top of her
-pattern: **per-agent model choice**, a **Notion control plane**, a **Slack front
-door**, and a **fork-ready kit** so the whole community can replicate it.
+```
+Nici (CEO) — Eva (Ops) — Bianca (Client Support)      HUMANS DECIDE
+   │            surfaces: NOTION board · SLACK front door
+   ▼
+CHIEF OF STAFF (CLAUDE.md) — routes, never does the work        [Sonnet]
+   │        reads: foundation/ (memory · voice · governance)
+   ▼
+DEPARTMENTS (departments/*/AGENT.md — authority, escalation, lanes)
+   ├─ Admin & Ops ──── inbox-manager [Sonnet] · calendar-coordinator [Haiku]
+   │                   meeting-scribe [Sonnet] · ops-coordinator [Sonnet]
+   ├─ Marketing ────── content-marketer [Sonnet → Fable for flagship]
+   ├─ Sales & Clients─ crm-manager [Sonnet] · client-success [Sonnet]
+   ├─ Finance ──────── bookkeeper [Opus]
+   └─ Strategy ─────── research-analyst [Sonnet→Opus] · data-reporter [Sonnet→Opus]
+   │
+CONNECTORS: Gmail · Calendar · Drive · Notion · HubSpot · Xero · Fathom ·
+Flodesk · Canva · Gamma · ThriveCart(#thrivecart) · analytics
+   │
+EXECUTION: Claude Code (this repo) — on demand + scheduled plays
+```
+
+**Load-bearing rule:** specialists live in `.claude/agents/` (that's what
+Claude Code runs); departments carry the *authority model* (what may act,
+draft, never), so agent files stay lean and cheap to run. Skill-DNA
+principles (governing principle, autonomy tiers, escalation, self-improvement
+with human approval) are carried by the department cards + governance file
+rather than repeated in all 10 agents.
+
+### The core loop
+
+1. A human (or Slack, or the CoS) creates a **Requests** row → `Inbox`.
+2. `/process-queue` (manual now, scheduled later) routes it: Owner agent set,
+   Status → `In progress`.
+3. The specialist runs **on its own model**, works via connectors, writes
+   **Output** + appends to the **Activity Log**, sets `Needs approval` or `Done`.
+4. Slack nudge for anything in `Needs approval`, linking the row.
+5. A human approves in Notion → a human performs the send · Status → `Done`.
 
 ---
 
 ## 3. Goals & non-goals
 
 ### Goals
-1. One conversational entry point (Chief of Staff) that routes to specialists.
-2. **Per-agent model selection** — match each agent to the cheapest model that
-   does its job well; upgrade the few that need more power.
-3. **Notion control plane** — request → route → work → approve, all visible in
-   Notion, with the knowledge base the agents read from.
-4. **Slack front door** — quick questions answered in-thread; approvals nudged.
-5. **Guardrails everywhere** — draft-by-default, money/contracts need a human,
-   privacy respected.
-6. **Proactivity** — scheduled briefs and queue-processing without prompting.
-7. **Replicable** — a documented kit any business can fork in an afternoon.
+1. One entry point (CoS) routing to departments and specialists.
+2. Per-agent model selection — spend proportional to stakes.
+3. Notion control plane — request → route → work → approve, all visible.
+4. Slack front door for quick answers and approval nudges.
+5. Guardrails everywhere — draft-by-default; money/contracts need a human.
+6. Proactivity — scheduled briefs and queue sweeps.
+7. **Dogfood → productise**: after a month of team use, genericise into the
+   Hub's CEO OS department + fork kit (§11).
 
 ### Non-goals (v1)
-- Not building a custom web app or bespoke bot infrastructure — we use Claude
-  Code + the official connectors + the official Claude for Slack app.
-- Not auto-sending client emails, moving money, or posting publicly without
-  human approval. Ever, in v1.
-- Not replacing humans — augmenting a small team.
+- No custom web app or bespoke bot infra — Claude Code + official connectors
+  + the official Claude for Slack app.
+- No auto-sending client emails, moving money, or posting publicly. Ever, in v1.
+- No Notion AI credits spent on reasoning (see §8 cost model).
+- Not replacing humans — augmenting a team of three.
 
 ---
 
@@ -83,309 +126,203 @@ door**, and a **fork-ready kit** so the whole community can replicate it.
 
 | User | Uses it for | Primary surface |
 | --- | --- | --- |
-| **Nici (owner)** | Delegating whole workflows; daily brief; approvals | Notion + Slack |
-| **Ops manager / team** | Quick questions ("is X booked?", "what's the promo code?"); logging tasks | Slack (quick), Notion (tasks) |
-| **VAs / contractors** | Picking up routed tasks, following SOPs | Notion |
-| **Community / socials** | Seeing the system as an aspirational template | The org chart + fork kit |
+| **Nici (CEO)** | Delegating whole workflows; daily brief; approvals | Notion + Slack |
+| **Eva (Ops)** | Quick questions; logging tasks; approving within her lane | Slack (quick), Notion (tasks) |
+| **Bianca (Client Support)** | Client comms drafts; Hub member questions | Notion + Slack |
+| **Hub members (later)** | The genericised CEO OS product | Fork kit |
 
 ---
 
 ## 5. Functional requirements
 
-### 5.1 Orchestration & routing
-- **FR-1** A single Chief of Staff interprets any request and assigns an owner
-  using the routing table in `CLAUDE.md`.
-- **FR-2** If a request spans specialists, the CoS splits it and coordinates.
-- **FR-3** Every response closes the loop: ✅ done · 📝 drafted · ⚠️ needs a human.
+Carried over from v1 (FR-1 → FR-19) with these amendments:
 
-### 5.2 Per-agent model selection  ← new
-- **FR-4** Each specialist declares the model it runs on (Claude Code subagent
-  `model:` frontmatter). See the **model matrix** in §7.
-- **FR-5** Model choice follows a rubric: *complexity × volume × stakes*. High-
-  volume/mechanical → cheapest; high-stakes/creative → strongest.
-- **FR-6** Model per agent is **config, not code** — changeable in one line (and,
-  optionally, surfaced in the Notion Agent Registry so non-devs can tune it).
-
-### 5.3 Notion control plane  ← new
-- **FR-7** A **Requests** database is the team's task queue. A human (or Slack, or
-  the CoS) creates a row; the CoS routes it; the specialist works it and writes
-  the result back; a human approves.
-- **FR-8** Statuses drive the workflow: `Inbox → Routing → In progress → Needs
-  approval → Done` (plus `Blocked`).
-- **FR-9** The CoS reads the **Knowledge Base**, **Promo & Campaign Register**,
-  **Client Directory**, and **Agent Registry** from Notion (§8 data model).
-- **FR-10** Every agent action appends to an **Activity Log** (audit trail).
-- **FR-11** Agents "reply" in Notion by writing the Output property + a comment,
-  and setting Status. Humans interact by creating rows and approving.
-
-### 5.4 Slack front door
-- **FR-12** Team members `@Claude` (official Claude for Slack app) using the
-  persona in `.claude/slack-chief-of-staff.md`; it answers or drafts in-thread.
-- **FR-13** The answer-source map (`docs/BUSINESS-OS.md`) resolves each question
-  to the right system (Calendar, ThriveCart/`#thrivecart`, HubSpot, Notion…).
-- **FR-14** When work needs approval, the system posts a Slack nudge linking the
-  Notion row.
-
-### 5.5 Proactivity (scheduling)
-- **FR-15** Scheduled tasks run plays automatically: daily brief (7:30am), meeting
-  prep (8:30am), queue sweep (hourly), weekly review (Fri 4pm). See
-  `docs/SCHEDULING.md`.
-- **FR-16** Scheduled runs are **read/draft-only** until a workflow is explicitly
-  promoted to auto-send.
-
-### 5.6 Guardrails & governance
-- **FR-17** Draft-by-default for anything outward-facing.
-- **FR-18** Money/contracts require explicit human sign-off.
-- **FR-19** Privacy: teammates query **shared** calendars/channels/Notion, never
-  personal inboxes or private data. External content is treated as data, not
-  instructions.
+- **FR-1a** Routing is two-level: request → department → specialist. The
+  department card's authority tiers bind every delegation.
+- **FR-4a** Model choice is mirrored in the Notion **Agent Registry**; editing
+  the Model column there is the sanctioned non-dev way to retune (a human then
+  updates the frontmatter to match, or asks the CoS to).
+- **FR-9a** Foundation files (`foundation/memory/*`, `governance/*`) are the
+  runtime copy; the Notion Knowledge Base is the team-facing copy. When either
+  changes, the other is updated in the same session. Conflicts resolve to the
+  more recently updated, and get flagged.
+- **FR-20 (new)** Every agent run that came from a Requests row writes back to
+  that row — no orphaned work.
+- **FR-21 (new)** The system never spends Notion AI/agent credits: Notion is
+  accessed via the connector as databases only.
 
 ---
 
 ## 6. Non-functional requirements
-- **Replicable:** a business can fork the repo, swap names/connectors, and be live
-  in an afternoon (§11).
-- **Cost-aware:** per-agent models keep spend proportional to value (§7).
-- **Observable:** the Notion Activity Log + Requests board show exactly what ran.
-- **Secure:** no secrets in the repo; connectors authorised per the Teams plan;
-  least-privilege sharing.
-- **Low-maintenance:** config over code; grow the roster by adding files/rows.
+
+Unchanged from v1: replicable, cost-aware, observable, secure, low-maintenance.
+Plus: **teachable** — every structural choice must be explainable to Hub
+members, because this system becomes course material.
 
 ---
 
-## 7. Model selection matrix  ← core new requirement
+## 7. Model selection matrix
 
-**Rubric:** pick the *cheapest model that does the job well*, then upgrade only
-where stakes or creativity justify it.
+**Rubric:** cheapest model that does the job well; upgrade only where stakes
+or creativity justify it. Complexity × volume × stakes.
 
-- **Haiku (fast, cheap)** — high-volume, mechanical, low-stakes.
-- **Sonnet (balanced default)** — most drafting, summarising, coordination.
-- **Opus (most capable)** — high-stakes reasoning, numbers, complex synthesis.
-- **Fable (creative)** — on-brand long-form/creative copy (optional upgrade).
-
-| Agent | Default model | Why |
+| Agent | Model | Why |
 | --- | --- | --- |
-| **Chief of Staff** (orchestrator) | Sonnet | Routing is frequent but not deep; upgrade to Opus for complex multi-part coordination. |
-| `inbox-manager` | Sonnet | Good writing + fast; bulk triage can drop to Haiku. |
-| `calendar-coordinator` | Haiku | Mechanical availability/booking logic. |
-| `meeting-scribe` | Sonnet | Faithful summarisation of transcripts. |
-| `content-marketer` | Sonnet (→ Fable for flagship) | Brand-voice copy; upgrade for hero pieces. |
-| `crm-manager` | Sonnet | Personalised but templated outreach + pipeline hygiene. |
-| `bookkeeper` | Opus | Numbers and accuracy; low volume, high stakes. |
-| `research-analyst` | Sonnet (→ Opus for deep) | Synthesis + verification; upgrade for hard questions. |
-| `ops-coordinator` | Sonnet | SOPs and tracking. |
-| `client-success` | Sonnet | Warm, accurate client comms. |
-| `data-reporter` | Sonnet (→ Opus to interpret) | Pull + explain; upgrade for "so what". |
+| Chief of Staff | Sonnet (Opus for complex multi-part coordination) | Frequent, not deep |
+| `inbox-manager` | Sonnet | Good writing, fast; bulk triage can drop to Haiku |
+| `calendar-coordinator` | **Haiku** | Mechanical availability logic |
+| `meeting-scribe` | Sonnet | Faithful summarisation |
+| `content-marketer` | Sonnet → **Fable** for flagship | Brand voice; hero pieces justify the upgrade |
+| `crm-manager` | Sonnet | Templated-but-personal outreach |
+| `client-success` | Sonnet | Warm, accurate client comms |
+| `bookkeeper` | **Opus** | Numbers; low volume, high stakes |
+| `research-analyst` | Sonnet → Opus for deep questions | Synthesis + verification |
+| `data-reporter` | Sonnet → Opus to interpret | Pull + explain the "so what" |
+| `ops-coordinator` | Sonnet | SOPs and tracking |
 
-**Implementation:** set `model:` in each `.claude/agents/*.md` frontmatter
-(values: `haiku` / `sonnet` / `opus`, or a full model id for Fable). This PRD
-ships with the defaults above already applied. Mirror the choice in the Notion
-Agent Registry so non-devs can retune without touching files.
-
-> Note on "different AI models": Claude Code subagents select among Claude models
-> per agent today (native, one-line config). A truly multi-vendor roster
-> (e.g. a non-Claude model for one agent) is possible but out of scope for v1 —
-> it needs a custom runner and adds cost/governance complexity for little gain.
-> Flagged as a future option in §12.
+Set via `model:` frontmatter in `.claude/agents/*.md` (✅ applied), mirrored
+in the Notion Agent Registry (✅ seeded). Multi-vendor models remain a §12
+future option.
 
 ---
 
-## 8. Data model — the Notion control plane
+## 8. Notion — the control plane and the cost model
 
-Six databases. Column types in brackets. A build agent creates these via the
-Notion connector (see §10 build steps).
+### 8.1 The six databases (✅ created; IDs in `docs/BUSINESS-OS.md`)
 
-### 8.1 `Requests` (the task queue / agent inbox)
-| Property | Type | Notes |
-| --- | --- | --- |
-| Title | Title | The ask, one line |
-| Requested by | Person/Text | Who asked |
-| Created | Created time | Auto |
-| Owner agent | Select | One of the 10 specialists (set by CoS) |
-| Status | Status | Inbox · Routing · In progress · Needs approval · Done · Blocked |
-| Priority | Select | High · Medium · Low |
-| Model used | Select | Which model ran it (audit) |
-| Output | Rich text / URL | The result or a link to the draft |
-| Needs approval | Checkbox | Gate for outward-facing actions |
-| Approved by | Person | Set on sign-off |
-| Due | Date | Optional |
+Schemas as per v1 §8: **Requests** (queue: Title, Requested by, Owner agent,
+Status, Priority, Model used, Output, Needs approval, Approved by, Due),
+**Agent Registry**, **Knowledge Base / SOPs**, **Promo & Campaign Register**,
+**Client Directory**, **Activity Log** (append-only audit).
 
-### 8.2 `Agent Registry` (human-editable config + docs)
-| Name | Role | Model | Connectors | Guardrails | Status (Active/Paused) |
-Mirrors `.claude/agents/`. Editing "Model" here is the non-dev way to retune §7.
+### 8.2 Board, not brain — the cost decision
 
-### 8.3 `Knowledge Base / SOPs`
-Pages the agents read: how-we-do-X, brand voice, policies. Source of truth for
-"how do we…?" questions.
+Notion's own AI stack (as at 07/2026):
 
-### 8.4 `Promo & Campaign Register`
-Per `docs/templates/promo-register.md`: Campaign · Code · Discount · Link · Runs ·
-For · ThriveCart product · Status. Answers "what's the affiliate code for X?".
+- **Workers** (background code: syncs, webhooks, agent tool calls) cost
+  **$0.0023/run** — free in beta until 10/08/2026, then a credits add-on on
+  Business/Enterprise plans. A daily sync ≈ $0.07/mo; hourly ≈ $1.66/mo.
+- **Custom Agent actions consume Notion credits** even during the beta.
+- **External Agents** (beta): @mention/assign external AI agents — Claude is
+  a named partner — inside Notion, with visible reasoning.
 
-### 8.5 `Client Directory`
-One row per active client: Owner · Status · Health · Next step · Last contact.
+Decision: **databases only.** All reasoning runs in Claude Code under the
+existing Claude seats (marginal cost ≈ $0). Notion Workers are optional
+post-beta glue (a new-row webhook instead of hourly polling: cents per month).
+Join the External Agents waitlist — "@mention Claude on a task" eventually
+replaces the queue sweep, but is not v1.
 
-### 8.6 `Activity Log` (append-only audit)
-Timestamp · Agent · Request · Action · Model · Result. Every run appends a row.
+**Total incremental running cost of v1: $0** (existing Claude + Notion +
+Slack plans). Post-08/2026 with optional webhook glue: ~$2–10/month.
 
----
+### 8.3 One system, not three
 
-## 9. Architecture
-
-```
-        ┌──────────────────────── SURFACES ─────────────────────────┐
-        │   NOTION (day-to-day control plane)     SLACK (quick chat) │
-        │   • Requests board                      • @Claude Q&A      │
-        │   • Knowledge / Promo / Clients         • approval nudges  │
-        └───────────────┬─────────────────────────────┬─────────────┘
-                        │  new/updated rows            │  mentions
-                        ▼                              ▼
-        ┌───────────────────────── ORCHESTRATION ─────────────────────┐
-        │   CHIEF OF STAFF  (CLAUDE.md)  — routes, never does the work │
-        │   model: Sonnet (Opus for complex coordination)             │
-        └───────────────┬─────────────────────────────────────────────┘
-                        │ delegates (each specialist has its own model)
-     ┌──────────┬───────┴───┬──────────┬──────────┬──────────┬─────────┐
-     ▼          ▼           ▼          ▼          ▼          ▼         ▼
-  inbox     calendar    meeting    content     crm       book     research
-  (Sonnet)  (Haiku)     (Sonnet)   (Sonnet/    (Sonnet)  keeper   analyst
-                                    Fable)                (Opus)   (Sonnet)
-     └────────────────────────── CONNECTORS ("hands") ───────────────────┘
-        Gmail · Calendar · Drive · Notion · HubSpot · Xero · Fathom ·
-        Flodesk · Canva · Gamma · ThriveCart(#thrivecart) · analytics
-                        │
-                        ▼
-        ┌───────────────────────── EXECUTION ─────────────────────────┐
-        │  CLAUDE CODE (this repo)  — on-demand + scheduled tasks:     │
-        │  daily brief · meeting prep · hourly queue sweep · weekly    │
-        └─────────────────────────────────────────────────────────────┘
-```
-
-### The core loop (Notion-driven)
-1. A human (or Slack, or the CoS) creates a **Requests** row → `Inbox`.
-2. A scheduled **queue sweep** (Claude Code) reads new rows, the CoS **routes**
-   (sets Owner agent, Status → `In progress`).
-3. The specialist runs **on its own model**, does the work via connectors, writes
-   **Output** + appends to **Activity Log**, sets `Needs approval` or `Done`.
-4. Slack posts a nudge for anything in `Needs approval`, linking the row.
-5. A human approves in Notion → any auto-send step fires; Status → `Done`.
+The mature personal skills in Nici's AI-HQ (`inbox-manager`, `daily-brief`,
+`client-project-manager`, `client-support-drafter`) are the reference
+implementations for the team specialists here. When a team specialist and an
+AI-HQ skill overlap, port the AI-HQ logic in — don't maintain two versions.
+Long-term, team-relevant AI-HQ skills migrate here.
 
 ---
 
-## 10. What's required to build it
+## 9. Slack front door
 
-### 10.1 Accounts / plans (all present or included)
-- Claude Teams plan (covers Claude Code + the official Claude for Slack app).
-- Notion, Slack (`aiherway.slack.com`), and the connectors already wired:
-  Gmail, Google Calendar/Drive, HubSpot, Xero, Fathom, Flodesk, Canva, Gamma,
-  analytics (Windsor.ai). ThriveCart surfaced via `#thrivecart`.
-
-### 10.2 Admin actions (human, one-time)
-- **A1** Install the **Claude for Slack** app; authorise its connectors; invite
-  it to channels (start with a private test channel). *(Admin — cannot be done
-  from an agent session.)*
-- **A2** Authorise the Notion connector for read/write to the Ai HerWay workspace.
-- **A3** Decide calendar sharing (free/busy to the team, or a shared calendar).
-- **A4** Approve creation of the six Notion databases (§8).
-
-### 10.3 Build tasks (assignable to a delivery agent)
-
-**Epic B — Per-agent models** *(small; largely shipped with this PRD)*
-- B1. Add `model:` frontmatter to all 10 specialists per §7. **AC:** each agent
-  file declares a model; a test run confirms the model is honoured.
-- B2. Document the rubric in `CLAUDE.md`. **AC:** rubric visible to future editors.
-
-**Epic N — Notion control plane**
-- N1. Create the six databases (§8) via the Notion connector. **AC:** databases
-  exist with the specified properties; IDs recorded in `docs/BUSINESS-OS.md`.
-- N2. Seed the Agent Registry from `.claude/agents/`. **AC:** 10 rows + CoS.
-- N3. Write `/process-queue` command: read `Inbox` rows, route, work, write back,
-  log. **AC:** a test row flows Inbox → Done with Output populated.
-- N4. Wire approval nudges to Slack. **AC:** a `Needs approval` row triggers a
-  Slack message linking the row.
-
-**Epic S — Slack front door**
-- S1. Finalise `.claude/slack-chief-of-staff.md` in the app's instructions.
-  **AC:** the two worked examples (calendar lookup, promo code) return correct
-  answers in a test channel.
-- S2. Slack → Notion capture: a message pattern (e.g. `!task …`) creates a
-  Requests row. **AC:** a Slack message appears as an `Inbox` row.
-
-**Epic P — Proactivity**
-- P1. Schedule daily brief, meeting prep, hourly queue sweep, weekly review
-  (`docs/SCHEDULING.md`). **AC:** each fires on schedule and posts to Slack.
-- P2. Keep all scheduled runs read/draft-only. **AC:** no auto-send in v1.
-
-**Epic R — Replication kit** (§11)
-- R1. Genericise into a `starter-kit/` with placeholders + a setup checklist.
-  **AC:** a second business can fork and configure without editing agent logic.
-
-### 10.4 Config / secrets
-- No secrets in the repo. Connector auth lives in the Claude/Slack/Notion
-  settings. Record only non-secret IDs (Notion DB IDs, Slack channel names) in
-  `docs/BUSINESS-OS.md`.
+As v1: official Claude for Slack app + `.claude/slack-chief-of-staff.md`
+persona; the answer-source map in `docs/BUSINESS-OS.md`; `!task …` messages
+become Requests rows; approval nudges link Notion rows. Workspace:
+`aiherway.slack.com`.
 
 ---
 
-## 11. Replication kit (the "gold standard, easy to fork" requirement)
+## 10. Remaining build steps
 
-Ship a `starter-kit/` that any business can clone:
-- **Generic `CLAUDE.md`** with `<<COMPANY>>`, `<<TIMEZONE>>`, `<<OWNER>>`
-  placeholders and an empty routing table.
-- **10 role-agnostic agent templates** + the model matrix.
-- **The six Notion database schemas** as an importable spec.
-- **A `SETUP.md` checklist**: connect tools → create Notion DBs → paste Slack
-  persona → set schedules → run the first `/daily-brief`.
-- **The org chart** (`docs/org-chart.html`) as a shareable explainer.
-- **A one-page "how it works"** for non-technical teammates.
+### 10.1 Admin actions (human, one-time)
+- **A1** Install Claude for Slack; authorise connectors; invite to a private
+  test channel first.
+- **A2** ✅ Notion connector authorised (databases created 07/07/2026).
+- **A3** Decide calendar sharing (free/busy to team, or shared calendar).
 
-Acceptance: a newcomer follows `SETUP.md` and has a working Chief of Staff + 3
-specialists answering in Slack within an afternoon.
+### 10.2 Rollout (see `docs/MANUAL.md` for the full test script)
+1. **Week 1 — manual:** team logs real tasks in Requests; Nici runs
+   `/process-queue` in Claude Code once or twice daily; tune routing +
+   governance from what breaks.
+2. **Week 2 — proactive:** turn on schedules (daily brief 7:30am, queue sweep
+   hourly through business hours, weekly review Fri 4pm) — draft-only.
+3. **Week 3 — Slack:** front door live to the whole team after the two worked
+   examples (calendar lookup, promo code) pass in the test channel.
+4. **Month 2 — productise:** genericise into `starter-kit/` → the Hub's CEO
+   OS department (§11).
+
+---
+
+## 11. The Hub product (was: replication kit)
+
+The genericised version of this repo **is the CEO OS department** the student
+library lists as coming-soon, plus the fork kit v1 specced:
+
+- Generic `CLAUDE.md` with `<<COMPANY>>` placeholders + empty routing table
+- Foundation templates (memory, voice, governance) — already generic in shape
+- 5 department cards + 10 specialist templates + the model matrix
+- The six Notion database schemas as an importable spec
+- `SETUP.md`: connect tools → create databases → paste Slack persona → set
+  schedules → run `/daily-brief`
+- The org chart + a one-page explainer for non-technical teammates
+
+Acceptance: a Hub member follows `SETUP.md` and has a working Chief of Staff
++ 3 specialists answering in Slack within an afternoon. Release cadence:
+per the AI OS monthly department releases.
 
 ---
 
 ## 12. Future options (post-v1)
-- **Multi-vendor models** — a non-Claude model for a specific agent via a custom
-  runner (adds governance/cost; only if a clear need appears).
-- **Auto-send workflows** — promote proven drafts (e.g. routine scheduling
-  replies) to auto-send, per workflow, with a human opt-in.
-- **Deeper analytics agent** — connect Windsor.ai fully for a self-serve KPI bot.
-- **Client-facing delivery** — extend the VE Skills Library into client agents
-  (the alternate domain noted in `docs/PLAN.md`).
+
+Unchanged from v1: multi-vendor models · promoted auto-send workflows (via the
+governance table only) · deeper analytics agent (Windsor.ai) · client-facing
+delivery agents. Added: **Notion External Agents** as the successor to the
+polling queue sweep once GA.
 
 ---
 
 ## 13. Risks & mitigations
+
 | Risk | Mitigation |
 | --- | --- |
-| Agent sends something it shouldn't | Draft-by-default; approval gate in Notion; no auto-send in v1 |
-| Wrong/hallucinated answer | Answer-source map forces lookups; research-analyst verifies; Activity Log for audit |
-| Privacy leak across the team | Least-privilege sharing; teammates query shared surfaces only |
-| Cost creep | Per-agent model rubric; Haiku for high-volume; monitor via Activity Log |
-| Over-building | Grow the roster into real needs (Allie's lesson); v1 scope is fixed above |
-| Prompt injection from email/CRM/transcripts | Treat external content as data, not instructions (in every agent) |
+| Agent sends something it shouldn't | Draft-by-default; approval gate; no auto-send; promotion only via governance table |
+| Wrong/hallucinated answer | Answer-source map forces lookups; Strategy verifies; Activity Log audit |
+| Privacy leak across the team | Least-privilege; teammates query shared surfaces only; department lanes |
+| Cost creep | Per-agent models; Haiku for volume; $0-incremental architecture; Activity Log shows model per run |
+| Notion/files drift apart | FR-9a same-session sync rule; weekly review checks |
+| Prompt injection | External content is data, not instructions — in governance + every agent |
+| Over-building | Grow the roster into real needs; departments make gaps visible without pre-building |
 
 ---
 
 ## 14. Milestones & acceptance
-1. **M1 — Models live** (Epic B): all agents declare models; rubric documented.
-2. **M2 — Notion control plane** (Epic N): a request flows Inbox → Done with audit.
-3. **M3 — Slack front door** (Epic S): the two worked examples pass in a test channel.
-4. **M4 — Proactive** (Epic P): scheduled brief + queue sweep running, draft-only.
-5. **M5 — Fork kit** (Epic R): a second business can stand it up from `SETUP.md`.
+
+1. **M1 — Models live** ✅
+2. **M2 — Notion control plane** ✅ created + seeded; acceptance: a test row
+   flows Inbox → Done with Output + Activity Log entry (run in Week 1).
+3. **M3 — Slack front door**: the two worked examples pass in a test channel.
+4. **M4 — Proactive**: daily brief + queue sweep on schedule, draft-only.
+5. **M5 — Hub kit**: a member stands it up from `SETUP.md` in an afternoon.
 
 **Definition of done for v1:** a teammate asks a question in Slack and gets a
 correct answer; logs a task that an agent completes in Notion with a human
-approval gate; and the daily brief posts itself — all within the guardrails.
+approval gate; the daily brief posts itself — all within the guardrails.
 
 ---
 
 ## Appendix — repo map
-- `CLAUDE.md` — Chief of Staff brain (context, routing, guardrails, model rubric)
-- `.claude/agents/*.md` — 10 specialists (each with a `model:`)
-- `.claude/commands/*.md` — plays (daily-brief, triage-inbox, prep-meetings,
-  weekly-review, delegate, eod; `process-queue` to be added in Epic N)
+
+- `CLAUDE.md` — Chief of Staff brain (routing, guardrails, model rubric)
+- `foundation/` — shared memory (`business-context`, `voice`), governance,
+  local logs
+- `departments/*/AGENT.md` — 5 department head cards (authority + escalation)
+- `.claude/agents/*.md` — 10 specialists, each with `model:` frontmatter
+- `.claude/commands/*.md` — plays (`daily-brief`, `process-queue`,
+  `triage-inbox`, `prep-meetings`, `weekly-review`, `delegate`, `eod`)
 - `.claude/slack-chief-of-staff.md` — Slack persona
-- `docs/BUSINESS-OS.md` — answer-source map + (to add) Notion DB IDs
+- `docs/MANUAL.md` — team manual: how to use it, how to test it
+- `docs/BUSINESS-OS.md` — answer-source map + Notion database IDs
 - `docs/PLAN.md` · `docs/RESEARCH.md` · `docs/SLACK.md` · `docs/SCHEDULING.md`
-- `docs/templates/promo-register.md` · `docs/org-chart.html`
+- `src/` — the VE Skills Dashboard (Vite app); unrelated, don't break it
