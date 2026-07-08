@@ -1,7 +1,16 @@
 # PRD — AI Her Way Digital Team (Chief of Staff + Departments)
 
-**Owner:** Nici (nici@aiherway.com.au) · **Status:** v2 — built, in team testing ·
-**Author:** Chief of Staff (Claude) · **Last updated:** 07/07/2026
+**Owner:** Nici (nici@aiherway.com.au) · **Status:** v2.1 — built, in team testing ·
+**Author:** Chief of Staff (Claude) · **Last updated:** 09/07/2026
+
+> **v2.1 addendum (09/07/2026):** Notion **Enterprise confirmed**, which unlocks
+> Claude agents inside Notion. New §8.4 adds a Notion-native **Chief of Staff
+> (Notion desk)** as the team's front door — @mention/assign inside Notion,
+> heavy work still executed by Claude Code at $0 marginal. Slack demoted from
+> "required front door" to "later nice-to-have". Competitive check against
+> Demarly.ai (hosted CEO-agent platform, $49.99/mo): same pattern, ours wins on
+> ownership, real connectors, Notion visibility, cost, and productisable IP —
+> their only edge (always-on) closes when our schedules turn on.
 
 > v2 supersedes the v1 draft. What changed: the flat 10-specialist roster is now
 > organised into **departments matching the AI OS we teach in the Hub**
@@ -43,7 +52,8 @@ reports back — with guardrails so nothing risky happens without a human.
 | Plays incl. `/process-queue` | ✅ Built (v2) |
 | Notion control plane (6 databases) | ✅ Created — IDs in `docs/BUSINESS-OS.md` |
 | Team manual (use + test) | ✅ `docs/MANUAL.md` |
-| Slack front door | ⬜ Admin install pending (§10.1 A1) |
+| Chief of Staff (Notion desk) — Claude agent in Notion | ⬜ Admin enable + paste `docs/NOTION-AGENT.md` (§8.4) |
+| Slack front door | ⬜ Optional, after Notion desk proves out (§10.1 A1) |
 | Schedules (daily brief, queue sweep) | ⬜ Turn on after first manual test week |
 | Fork kit → Hub CEO OS product | ⬜ After a month of internal dogfooding |
 
@@ -213,7 +223,37 @@ Join the External Agents waitlist — "@mention Claude on a task" eventually
 replaces the queue sweep, but is not v1.
 
 **Total incremental running cost of v1: $0** (existing Claude + Notion +
-Slack plans). Post-08/2026 with optional webhook glue: ~$2–10/month.
+Slack plans). Post-08/2026 with optional webhook glue: ~$2–10/month. The
+Notion-desk agent (§8.4) adds per-run Notion credits for *light* interactions
+only — heavy work stays on the Claude seats.
+
+### 8.4 The Notion-native front door — Chief of Staff (Notion desk)  ← new in v2.1
+
+We are on **Notion Enterprise**, so Claude agents run natively in Notion
+(Agents → New Agent → Claude; no Anthropic account needed; admin enables
+under Settings → Notion AI → Agents → Manage external agents; billed per run
+in Notion credits).
+
+The **Notion desk** is a Claude agent created in the Notion sidebar carrying
+a condensed CoS persona (`docs/NOTION-AGENT.md` is the paste-ready config).
+Division of labour:
+
+| | Notion desk (Claude agent in Notion) | Engine (Claude Code, this repo) |
+| --- | --- | --- |
+| Team @mentions/chats/assigns in Notion | ✅ Answers, triages, routes | — |
+| Read KB / Promo Register / Client Directory | ✅ | ✅ |
+| Update Requests rows, statuses, comments | ✅ | ✅ |
+| Draft emails via Gmail, Xero, HubSpot, Fathom, web research | ❌ (no connectors, no web) | ✅ |
+| Cost per interaction | Notion credits (per run) | $0 (Claude seats) |
+
+Rules baked into the desk persona: it never attempts heavy work (routes it by
+setting the Requests row for the next queue run), never approves anything,
+and observes the same governance tiers. Notion agents cannot browse the web
+or call other agents — that's fine; that's the engine's job.
+
+This gives the team the "everything visible and actionable in Notion"
+experience without renting a platform (cf. Demarly) and without burning
+credits on work our Claude seats already cover.
 
 ### 8.3 One system, not three
 
@@ -245,11 +285,13 @@ become Requests rows; approval nudges link Notion rows. Workspace:
 ### 10.2 Rollout (see `docs/MANUAL.md` for the full test script)
 1. **Week 1 — manual:** team logs real tasks in Requests; Nici runs
    `/process-queue` in Claude Code once or twice daily; tune routing +
-   governance from what breaks.
+   governance from what breaks. In parallel: admin enables Claude agents and
+   sets up the **Notion desk** from `docs/NOTION-AGENT.md`.
 2. **Week 2 — proactive:** turn on schedules (daily brief 7:30am, queue sweep
-   hourly through business hours, weekly review Fri 4pm) — draft-only.
-3. **Week 3 — Slack:** front door live to the whole team after the two worked
-   examples (calendar lookup, promo code) pass in the test channel.
+   hourly through business hours, weekly review Fri 4pm) — draft-only. Notion
+   desk live to the whole team.
+3. **Week 3 — Slack (optional):** add the Slack front door if the team still
+   wants it after a week of the Notion desk.
 4. **Month 2 — productise:** genericise into `starter-kit/` → the Hub's CEO
    OS department (§11).
 
@@ -278,8 +320,9 @@ per the AI OS monthly department releases.
 
 Unchanged from v1: multi-vendor models · promoted auto-send workflows (via the
 governance table only) · deeper analytics agent (Windsor.ai) · client-facing
-delivery agents. Added: **Notion External Agents** as the successor to the
-polling queue sweep once GA.
+delivery agents. Added: **Notion Workers** (webhook on new Requests rows →
+no polling; custom agent tools) as post-beta glue, and richer Notion-desk
+duties as the Claude-in-Notion integration matures.
 
 ---
 

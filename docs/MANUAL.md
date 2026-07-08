@@ -50,6 +50,15 @@ Humans stay the CEO — the AI drafts, we decide.
 Moves campaign?". For tasks, start the message with `!task ` and it becomes a
 Requests row automatically.
 
+### B2. The Notion desk — chat without leaving Notion
+
+Once the **Chief of Staff (Notion desk)** agent is enabled (setup:
+`docs/NOTION-AGENT.md`), you can @mention it or assign it a Requests row
+right inside Notion. It answers questions from the Knowledge Base and
+registers, creates and routes Requests rows, and tells you what happens
+next. It deliberately does *not* draft client emails or reports itself —
+it routes those to the queue, where the engine does them for free.
+
 ### C. Claude Code — direct (Nici, mostly)
 
 Open Claude Code in this repo and just ask, or run a play:
